@@ -1,34 +1,29 @@
 import { useSession, signOut } from "next-auth/react";
+import Modal from "~/components/UI/Modal";
+import TagsCreation from "./TagsCreation";
 
 export function Dashboard() {
-    const { data } = useSession();
+  const { data } = useSession();
 
-    return (
-        <div className="hero min-h-screen bg-base-200">
-            <div className="hero-content">
-                <div className="max-w-lg">
-                    <h1 className="text-5xl text-center font-bold leading-snug text-gray-400">
-                        You are logged in!
-                    </h1>
-                    <p className="my-4 text-center leading-loose">
-                        You are allowed to visit this page because you have a session,
-                        otherwise you would be redirected to the login page.
-                    </p>
-                    <div className="mockup-code mb-2">
-            <pre className='px-4'>
-              <code>{JSON.stringify(data, null, 2)}</code>
-            </pre>
-                    </div>
-                    <div className="text-center">
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => signOut({ callbackUrl: "/" })}
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div>
+        <div className="navbar justify-between bg-base-100">
+          <a className="btn btn-ghost normal-case text-xl">DataTrak</a>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="btn btn-ghost btn-sm normal-case"
+          >
+            Logout
+          </button>
         </div>
-    );
-};
+      </div>
+      <div className="flex items-center justify-end mt-2">
+        <Modal modalButtonText="New Search" tooltip="Start a new Search">
+          <div className="text-2xl font-semibold mb-2">Start New Search</div>
+          <TagsCreation />
+        </Modal>
+      </div>
+    </div>
+  );
+}
