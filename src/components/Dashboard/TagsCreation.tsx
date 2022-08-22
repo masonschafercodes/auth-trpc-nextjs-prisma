@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { IKeyword, keywordSchema } from "~/utils/schemas/keywords";
 import {
   ITwitterUsername,
   twitterUsernameSchema,
@@ -48,7 +47,7 @@ export default function TagsCreation() {
         <div className="form-control w-full">
           <input
             type="text"
-            placeholder="twitter username"
+            placeholder="keyword to search"
             disabled={!!twitterUsername}
             className="input input-bordered w-full"
             {...register("username")}
@@ -56,7 +55,7 @@ export default function TagsCreation() {
         </div>
       </form>
       <div className="my-4 space-y-2">
-        <h3 className="font-semibold">Username</h3>
+        <h3 className="font-semibold">Keyword</h3>
         {twitterUsername ? (
           <div className=" flex items-center gap-2">
             <div className="flex items-center">

@@ -55,6 +55,10 @@ export const keywordsRouter = createRouter().mutation("create", {
         request.continue();
       } else {
         request.abort();
+        throw new trpc.TRPCError({
+          code: "BAD_REQUEST",
+          message: "Please enter a valid twitter username",
+        });
       }
     });
 
@@ -91,10 +95,7 @@ export const keywordsRouter = createRouter().mutation("create", {
     });
     $(jobLinkSelector).each((i, elem) => {
       let href = $(elem).attr("href");
-      if (href?.charAt(0) === "/")
-        href =
-          `https://www.indeed.com/jobs?q=${input.username}&l=United States&start=0` +
-          href;
+      if (href?.charAt(0) === "/") href = `https://www.indeed.com` + href;
       result[i].jobLink = href;
     });
 
