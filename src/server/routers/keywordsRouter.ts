@@ -34,7 +34,11 @@ const getOptions = async () => {
 export const keywordsRouter = createRouter().mutation("create", {
   input: twitterUsernameSchema,
   resolve: async ({ input, ctx }) => {
-    const followerSelector = `a[href='/${input.username}/followers']`;
+    const titleSelector = ".jcs-JobTitle span";
+    const ratingNumberSelector = ".ratingNumber span";
+    const locationSelector = ".companyLocation";
+    const companyNameSelector = ".companyName";
+    const jobLinkSelector = "a[data-jk]";
 
     const options = await getOptions();
     const browser = await puppeteer.launch(options);
@@ -55,10 +59,12 @@ export const keywordsRouter = createRouter().mutation("create", {
     });
 
     await page
-      .goto(`https://mobile.twitter.com/${input.username}`, {
-        timeout: 0,
-        waitUntil: "networkidle2",
-      })
+      .goto(
+        `https://www.indeed.com/jobs?q=${input.username}&l=United States&start=0`,
+        {
+          timeout: 0,
+        }
+      )
       .then(async (response) => {});
 
     const html = await page.evaluate(() => {
@@ -66,19 +72,38 @@ export const keywordsRouter = createRouter().mutation("create", {
     });
     const $ = cheerio.load(html);
 
-    const followerCountString = $(followerSelector)
-      .text()
-      .match(/[0-9]/gi)
-      ?.join("");
+    let result: any[] = [];
+    for (let i = 0; i < $(titleSelector).length; i++) {
+      result.push({});
+    }
+
+    $(titleSelector).each((i, elem) => {
+      result[i].title = $(elem).text();
+    });
+    $(ratingNumberSelector).each((i, elem) => {
+      result[i].ratingNumber = $(elem).text();
+    });
+    $(locationSelector).each((i, elem) => {
+      result[i].location = $(elem).text();
+    });
+    $(companyNameSelector).each((i, elem) => {
+      result[i].companyName = $(elem).text();
+    });
+    $(jobLinkSelector).each((i, elem) => {
+      let href = $(elem).attr("href");
+      if (href?.charAt(0) === "/")
+        href =
+          `https://www.indeed.com/jobs?q=${input.username}&l=United States&start=0` +
+          href;
+      result[i].jobLink = href;
+    });
 
     await browser.close();
 
     return {
       status: 201,
       message: "Account Created",
-      result: {
-        followerCount: Number(followerCountString),
-      },
+      result: result,
     };
   },
 });
