@@ -55,10 +55,6 @@ export const keywordsRouter = createRouter().mutation("create", {
         request.continue();
       } else {
         request.abort();
-        throw new trpc.TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please enter a valid twitter username",
-        });
       }
     });
 
