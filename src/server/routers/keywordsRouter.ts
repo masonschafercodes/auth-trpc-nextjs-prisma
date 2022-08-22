@@ -103,7 +103,7 @@ export const keywordsRouter = createRouter().mutation("create", {
 
     return {
       status: 201,
-      message: "Account Created",
+      message: "Data successfully retrieved",
       result: result,
     };
   },

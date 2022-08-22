@@ -7,7 +7,11 @@ import {
 } from "~/utils/schemas/username";
 import { trpc } from "~/utils/trpc";
 
-export default function TagsCreation() {
+interface Props {
+  setIndeedData: React.Dispatch<any>;
+}
+
+export default function TagsCreation({ setIndeedData }: Props) {
   const [twitterUsername, setTwitterUsername] =
     React.useState<ITwitterUsername>();
 
@@ -34,11 +38,11 @@ export default function TagsCreation() {
       const result = await mutateAsync(data);
 
       if (result.status === 201) {
-        console.log(result);
+        setIndeedData(result);
         setTwitterUsername(undefined);
       }
     },
-    [mutateAsync]
+    [mutateAsync, setIndeedData]
   );
 
   return (
