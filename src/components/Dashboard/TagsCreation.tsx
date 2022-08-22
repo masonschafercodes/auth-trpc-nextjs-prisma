@@ -2,25 +2,45 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { IKeyword, keywordSchema } from "~/utils/schemas/keywords";
+import {
+  ITwitterUsername,
+  twitterUsernameSchema,
+} from "~/utils/schemas/username";
+import { trpc } from "~/utils/trpc";
 
 export default function TagsCreation() {
-  const [keywords, setKeywords] = React.useState<IKeyword[]>([]);
+  const [twitterUsername, setTwitterUsername] =
+    React.useState<ITwitterUsername>();
 
-  const { register, handleSubmit, resetField } = useForm<IKeyword>({
-    resolver: zodResolver(keywordSchema),
+  const { register, handleSubmit, resetField } = useForm<ITwitterUsername>({
+    resolver: zodResolver(twitterUsernameSchema),
   });
 
   const onSubmit = useCallback(
-    async (data: IKeyword) => {
-      setKeywords([...keywords, data]);
-      resetField("keyword");
+    async (data: ITwitterUsername) => {
+      setTwitterUsername(data);
+      resetField("username");
     },
-    [keywords, resetField]
+    [resetField]
   );
 
-  const handleRemoveKeywordFromList = (keyword: IKeyword) => {
-    setKeywords(keywords.filter((k) => k.keyword !== keyword.keyword));
+  const handleRemoveKeywordFromList = () => {
+    setTwitterUsername(undefined);
   };
+
+  const { mutateAsync } = trpc.useMutation(["keywords.create"]);
+
+  const handleSubmitTwitterUsername = useCallback(
+    async (data: ITwitterUsername) => {
+      const result = await mutateAsync(data);
+
+      if (result.status === 201) {
+        console.log(result);
+        setTwitterUsername(undefined);
+      }
+    },
+    [mutateAsync]
+  );
 
   return (
     <>
@@ -28,37 +48,41 @@ export default function TagsCreation() {
         <div className="form-control w-full">
           <input
             type="text"
-            placeholder="keywords"
-            disabled={keywords.length >= 5}
+            placeholder="twitter username"
+            disabled={!!twitterUsername}
             className="input input-bordered w-full"
-            {...register("keyword")}
+            {...register("username")}
           />
-          <label className="label">
-            <span className="label-text-alt text-gray-600">
-              Add up to 5 tags for the search
-            </span>
-          </label>
         </div>
       </form>
       <div className="my-4 space-y-2">
-        <h3 className="font-semibold">Tags</h3>
-        {keywords.length > 0 ? (
+        <h3 className="font-semibold">Username</h3>
+        {twitterUsername ? (
           <div className=" flex items-center gap-2">
-            {keywords.map((keyword, index) => (
-              <div key={index} className="flex items-center">
-                <div
-                  aria-label={keyword.keyword}
-                  className="bg-gray-700 hover:bg-red-500 hover:cursor-pointer p-1 rounded-lg font-semibold text-xs"
-                  onClick={() => handleRemoveKeywordFromList(keyword)}
-                >
-                  {keyword.keyword}
-                </div>
+            <div className="flex items-center">
+              <div
+                aria-label={twitterUsername.username}
+                className="bg-gray-700 hover:bg-red-500 hover:cursor-pointer p-1 rounded-lg font-semibold text-xs"
+                onClick={() => handleRemoveKeywordFromList()}
+              >
+                {twitterUsername.username}
               </div>
-            ))}
+            </div>
           </div>
         ) : (
-          <div className="text-sm text-gray-700">No tags yet</div>
+          <div className="text-sm text-gray-700">No username yet</div>
         )}
+      </div>
+      <div className="mt-2">
+        <button
+          className="btn w-full"
+          disabled={!twitterUsername}
+          onClick={() =>
+            handleSubmitTwitterUsername(twitterUsername as ITwitterUsername)
+          }
+        >
+          Start Search
+        </button>
       </div>
     </>
   );

@@ -18,7 +18,7 @@ export default function Modal({ modalButtonText, children, tooltip }: Props) {
 
         <input type="checkbox" id="my-modal-4" className="modal-toggle" />
         <div className="modal">
-          <div className="modal-box relative border border-gray-600">
+          <div className="modal-box relative border border-gray-600 bg-base-300">
             <label
               htmlFor="my-modal-4"
               className="btn btn-xs btn-circle absolute right-2 top-2"
