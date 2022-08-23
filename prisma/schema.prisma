@@ -19,6 +19,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   integrations Integration[]
+  savedSearches savedSearch[]
 }
 
 model Integration {
@@ -26,6 +27,16 @@ model Integration {
     userId String
     type String
     data String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user User @relation(fields: [userId], references: [id])
+}
+
+model savedSearch {
+    id String @id @default(cuid())
+    userId String
+    query String
+    result String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     user User @relation(fields: [userId], references: [id])

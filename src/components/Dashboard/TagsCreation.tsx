@@ -7,18 +7,20 @@ import {
 } from "~/utils/schemas/username";
 import {trpc} from "~/utils/trpc";
 import {Integration} from "@prisma/client";
-import {extractToken} from "~/utils/extractToken";
 import {isClearbitEnabled} from "~/Integrations/Clearbit";
+import {useSession} from "next-auth/react";
 
 interface Props {
     setIndeedData: React.Dispatch<any>;
     integrationsEnabled: Integration[];
+    refetchSavedSearches: () => void;
 }
 
-export default function TagsCreation({setIndeedData, integrationsEnabled}: Props) {
+export default function TagsCreation({setIndeedData, integrationsEnabled, refetchSavedSearches}: Props) {
     const [keyword, setKeyword] =
         React.useState<string>();
     const [isLoading, setIsLoading] = React.useState(false);
+    const [shouldSaveSearch, setShouldSaveSearch] = React.useState(false);
 
     const {register, handleSubmit, resetField} = useForm<IKeywordSearch>({
         resolver: zodResolver(keywordSearchSchema),
@@ -48,11 +50,16 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
             } catch (error) {
                 console.error(error);
             } finally {
+                if (shouldSaveSearch) {
+                    refetchSavedSearches();
+                }
                 setIsLoading(false);
             }
         },
         [mutateAsync, setIndeedData]
     );
+
+    const { data: session } = useSession();
 
     return (
         <>
@@ -85,6 +92,14 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
                     <div className="text-sm text-gray-700">No tags yet</div>
                 )}
             </div>
+            <div className='my-2'>
+                <div className="form-control">
+                    <label className="label cursor-pointer">
+                        <span className="label-text font-semibold text-gray-500">Save this Search?</span>
+                        <input type="checkbox" onChange={(e) => setShouldSaveSearch(e.target.checked)} checked={shouldSaveSearch} className="checkbox checkbox-primary"/>
+                    </label>
+                </div>
+            </div>
             <div className="mt-2">
                 <button
                     className="btn w-full"
@@ -92,6 +107,9 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
                     onClick={() =>
                         handleSubmitKeywordSearch({
                             username: keyword as string,
+                            shouldSave: shouldSaveSearch,
+                            // @ts-ignore
+                            userId: session?.id,
                         })
                     }
                 >

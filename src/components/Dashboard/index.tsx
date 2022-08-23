@@ -1,10 +1,11 @@
 import React from "react";
-import {signOut} from "next-auth/react";
+import {signOut, useSession} from "next-auth/react";
 import Modal from "~/components/UI/Modal";
 import TagsCreation from "./TagsCreation";
 import IndeedResultList from "./IndeedResultList";
 import {trpc} from "~/utils/trpc";
 import {getClearbitIntegrationKey, isClearbitEnabled} from "~/Integrations/Clearbit";
+import {Session} from "next-auth";
 
 interface IIndeedDataResponse {
     status: number;
@@ -20,10 +21,18 @@ export interface IIndeedDataResult {
     jobLink: string;
 }
 
+interface ISavedSearch {
+    createdAt: string;
+    id: string;
+    query: string;
+    result: IIndeedDataResult[];
+}
+
 export function Dashboard() {
-    // const { data } = useSession();
+    const { data: session } = useSession();
     const [indeedData, setIndeedData] = React.useState<IIndeedDataResponse>();
     const [shouldCloseModal, setShouldCloseModal] = React.useState(false);
+    const [savedSearches, setSavedSearches] = React.useState<ISavedSearch[]>([]);
 
     React.useEffect(() => {
         if (indeedData) {
@@ -32,12 +41,24 @@ export function Dashboard() {
     }, [indeedData]);
 
     const {
-        isLoading,
-        isLoadingError,
-        error,
-        isError,
         data: IntegrationsData
     } = trpc.useQuery(["integrations.getIntegrations"])
+
+    const { data: SavedSearchData, isLoading: isSavedSearchesLoading, refetch: refetchSavedSearches } = trpc.useQuery(["keywords.get", { userId: session?.user?.email as string }], {
+        refetchOnWindowFocus: false,
+        onSuccess: (data: any) => {
+            data.result.map((savedSearch: any) => {
+                setSavedSearches(prevSavedSearches => [...prevSavedSearches, {
+                    createdAt: savedSearch.createdAt,
+                    id: savedSearch.id,
+                    query: savedSearch.query,
+                    result: JSON.parse(savedSearch.result)
+                }]);
+            })
+        }
+    });
+
+    //
 
     return (
         <div className="max-w-6xl mx-auto">
@@ -70,10 +91,24 @@ export function Dashboard() {
                 >
                     <div className="text-2xl font-semibold mb-2">Start New Search</div>
                     <TagsCreation integrationsEnabled={IntegrationsData !== undefined ? IntegrationsData : []}
-                                  setIndeedData={setIndeedData}/>
+                                  setIndeedData={setIndeedData} refetchSavedSearches={refetchSavedSearches}/>
                 </Modal>
             </div>
             <div className="my-12 flex flex-col justify-center items-center w-full">
+                {isSavedSearchesLoading ? <div>Loading...</div> : (
+                    <div>
+                        <div className="text-2xl font-semibold mb-2">Saved Searches</div>
+                        <div className="flex flex-col gap-2">
+                            {savedSearches.map((savedSearch: ISavedSearch) => (
+                                <div key={savedSearch.id} className="flex flex-col gap-2">
+                                    <div className="text-2xl font-semibold mb-2">{savedSearch.query}</div>
+                                    <code>{JSON.stringify(savedSearch.result, null, 2)}</code>
+                                    <div className="text-sm text-gray-600">{savedSearch.createdAt}</div>
+                                </div>
+))}
+                    </div>
+                </div>
+                )}
                 {!indeedData ? (
                     <h1 className="text-sm font-semibold text-gray-600">
                         No jobs searched yet!

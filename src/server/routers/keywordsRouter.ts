@@ -1,10 +1,10 @@
-import * as trpc from "@trpc/server";
 import createRouter from "~/utils/createTRPCRouter";
 import {keywordSearchSchema} from "~/utils/schemas/username";
 
 import * as cheerio from "cheerio";
 import * as puppeteer from "puppeteer";
 import {IIndeedDataResult} from "~/components/Dashboard";
+import {z} from "zod";
 
 const chrome = require("chrome-aws-lambda");
 
@@ -96,7 +96,7 @@ export const keywordsRouter = createRouter().mutation("create", {
             result[i].location = $(elem).text();
         });
         $(companyNameSelector).each((i, elem) => {
-                result[i].companyName = $(elem).text();
+            result[i].companyName = $(elem).text();
         });
         $(jobLinkSelector).each((i, elem) => {
             let href = $(elem).attr("href");
@@ -106,10 +106,60 @@ export const keywordsRouter = createRouter().mutation("create", {
 
         await browser.close();
 
+        if (input.shouldSave) {
+            await ctx.prisma.savedSearch.create({
+                data: {
+                    user: {
+                        connect: {
+                            id: input.userId,
+                        }
+                    },
+                    query: input.username,
+                    result: JSON.stringify(result, null, 2),
+                }
+            });
+        }
+
         return {
             status: 201,
             message: "Data successfully retrieved",
             result: result,
         };
     },
-});
+})
+    .query("get", {
+        input: z.object({
+            userId: z.string(),
+        }),
+        resolve: async ({input, ctx}) => {
+
+            const user = await ctx.prisma.user.findFirst({
+                where: {
+                    email: input.userId,
+                }
+            })
+
+            if (user) {
+            const savedSearches = await ctx.prisma.savedSearch.findMany({
+                where: {
+                    user: {
+                        id: user.id,
+                    },
+                },
+            });
+
+            return {
+                status: 200,
+                message: "Data successfully retrieved",
+                result: savedSearches,
+            };
+            }
+
+            return {
+                status: 404,
+                message: "User not found",
+                result: [],
+            }
+
+        }
+    })
