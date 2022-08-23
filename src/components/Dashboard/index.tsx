@@ -4,7 +4,7 @@ import Modal from "~/components/UI/Modal";
 import TagsCreation from "./TagsCreation";
 import IndeedResultList from "./IndeedResultList";
 import {trpc} from "~/utils/trpc";
-import {isClearbitEnabled} from "~/Integrations/Clearbit";
+import {getClearbitIntegrationKey, isClearbitEnabled} from "~/Integrations/Clearbit";
 
 interface IIndeedDataResponse {
     status: number;
@@ -89,6 +89,7 @@ export function Dashboard() {
                                 ratingNumber={result.ratingNumber}
                                 companyName={result.companyName}
                                 isClearbitEnabled={isClearbitEnabled(IntegrationsData ?? [])}
+                                clearbitIntegrationKey={getClearbitIntegrationKey(IntegrationsData ?? [])}
                             />
                         ))}
                     </div>

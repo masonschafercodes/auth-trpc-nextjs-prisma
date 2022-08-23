@@ -3,9 +3,11 @@ import React from "react";
 import { IIndeedDataResult } from ".";
 import TagsCreation from "~/components/Dashboard/TagsCreation";
 import Modal from "~/components/UI/Modal";
+import ClearbitEnrichment from "~/components/Dashboard/ClearbitEnrichment";
 
 interface Props extends IIndeedDataResult {
   isClearbitEnabled: boolean;
+  clearbitIntegrationKey: string;
 }
 
 export default function IndeedResultList(props: Props) {
@@ -42,9 +44,13 @@ export default function IndeedResultList(props: Props) {
           <div className='mt-2'>
             <Modal
                 modalButtonText="See Enrichment Data"
-                modalName="enrichment-modal"
+                tooltip={`See Enrichment Data for ${props.title}`}
+                modalName={`enrichment-modal-${props.title}`}
             >
               <div className="text-2xl font-semibold mb-2">Enrichment</div>
+              <div className='mt-3'>
+                <ClearbitEnrichment companyName={props.companyName} apiKey={props.clearbitIntegrationKey} />
+              </div>
             </Modal>
           </div>
       )}
