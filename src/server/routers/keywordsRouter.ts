@@ -10,7 +10,7 @@ const exePath =
   process.platform === "win32"
     ? "C:Program Files (x86)GoogleChromeApplicationchrome.exe"
     : process.platform === "linux"
-    ? "/usr/bin/google-chrome"
+    ? "/usr/bin/google-chrome-stable"
     : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const getOptions = async () => {

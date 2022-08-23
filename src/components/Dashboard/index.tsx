@@ -34,12 +34,21 @@ export function Dashboard() {
       <div>
         <div className="navbar justify-between bg-base-100">
           <a className="btn btn-ghost normal-case text-xl">DataTrak</a>
+          <div className='flex gap-2'>
+            <a href='/profile' className="btn btn-ghost btn-sm normal-case">
+              Profile
+            </a>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            <a href='/dashboard' className="btn btn-ghost btn-sm normal-case">
+              Dashboard
+            </a>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
             className="btn btn-ghost btn-sm normal-case"
           >
             Logout
           </button>
+          </div>
         </div>
       </div>
       <div className="flex items-center justify-end mt-2">
