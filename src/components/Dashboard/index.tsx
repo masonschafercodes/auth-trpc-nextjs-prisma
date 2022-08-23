@@ -4,6 +4,7 @@ import Modal from "~/components/UI/Modal";
 import TagsCreation from "./TagsCreation";
 import IndeedResultList from "./IndeedResultList";
 import {trpc} from "~/utils/trpc";
+import {isClearbitEnabled} from "~/Integrations/Clearbit";
 
 interface IIndeedDataResponse {
     status: number;
@@ -17,94 +18,7 @@ export interface IIndeedDataResult {
     ratingNumber: string;
     location: string;
     jobLink: string;
-    clearbitData: Object[];
 }
-
-// interface IClearbitData {
-//     "id": string;
-//     "name": string;
-//     "legalName": string;
-//     "domain": string;
-//     "domainAliases": string[];
-//     "site": {
-//         "phoneNumbers": string[],
-//         "emailAddresses": string[],
-//     },
-//     "category": {
-//         "sector": string;
-//         "industryGroup": string;
-//         "industry": string;
-//         "subIndustry": string;
-//         "sicCode": string;
-//         "naicsCode": string;
-//     },
-//     "tags": string[];
-//     "description": string;
-//     "foundedYear": number;
-//     "location": string;
-//     "timeZone": string;
-//     "utcOffset": number;
-//     "geo": {
-//         "streetNumber": string;
-//         "streetName": string;
-//         "subPremise": string | null;
-//         "city": string;
-//         "postalCode": string;
-//         "state": string;
-//         "stateCode": string;
-//         "country": string;
-//         "countryCode": string;
-//         "lat": number;
-//         "lng": number;
-//     },
-//     "logo": string;
-//     "facebook": {
-//         "handle": string | null;
-//     },
-//     "linkedin": {
-//         "handle": string | null;
-//     },
-//     "twitter": {
-//         "handle": string;
-//         "id": string;
-//         "bio": string;
-//         "followers": number;
-//         "following": number;
-//         "location": string;
-//         "site": string;
-//         "avatar": string;
-//     },
-//     "crunchbase": {
-//         "handle": string | null;
-//     },
-//     "emailProvider": boolean;
-//     "type": string;
-//     "ticker": string | null;
-//     "identifiers": {
-//         "usEIN": string | null;
-//     },
-//     "phone": string | null;
-//     "indexedAt": string;
-//     "metrics": {
-//         "alexaUsRank": number;
-//         "alexaGlobalRank": number;
-//         "employees": number;
-//         "employeesRange": string;
-//         "marketCap": number | null;
-//         "raised": number;
-//         "annualRevenue": number | null;
-//         "estimatedAnnualRevenue": string | null;
-//         "fiscalYearEnd": number | null;
-//     },
-//     "tech": string[];
-//     "techCategories": string[];
-//     "parent": {
-//         "domain": string | null;
-//     },
-//     "ultimateParent": {
-//         "domain": string | null;
-//     }
-// }
 
 export function Dashboard() {
     // const { data } = useSession();
@@ -151,6 +65,7 @@ export function Dashboard() {
                 <Modal
                     modalButtonText="New Search"
                     tooltip="Start a new Search"
+                    modalName="indeed-search"
                     closeOnDataPropagation={shouldCloseModal}
                 >
                     <div className="text-2xl font-semibold mb-2">Start New Search</div>
@@ -173,7 +88,7 @@ export function Dashboard() {
                                 location={result.location}
                                 ratingNumber={result.ratingNumber}
                                 companyName={result.companyName}
-                                clearbitData={result.clearbitData}
+                                isClearbitEnabled={isClearbitEnabled(IntegrationsData ?? [])}
                             />
                         ))}
                     </div>

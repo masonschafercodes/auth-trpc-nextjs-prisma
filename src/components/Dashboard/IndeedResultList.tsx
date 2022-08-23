@@ -1,8 +1,14 @@
 import { ArrowSquareOut, Sparkle } from "phosphor-react";
 import React from "react";
 import { IIndeedDataResult } from ".";
+import TagsCreation from "~/components/Dashboard/TagsCreation";
+import Modal from "~/components/UI/Modal";
 
-export default function IndeedResultList(props: IIndeedDataResult) {
+interface Props extends IIndeedDataResult {
+  isClearbitEnabled: boolean;
+}
+
+export default function IndeedResultList(props: Props) {
   return (
     <div className="p-3 rounded-xl border-2 border-gray-700 w-full">
       <div className="flex items-center justify-between">
@@ -32,11 +38,16 @@ export default function IndeedResultList(props: IIndeedDataResult) {
           <ArrowSquareOut size={18} className="text-gray-200" />
         </a>
       </div>
-      <div>
-        <pre>
-          <code>{JSON.stringify(props.clearbitData, null, 2)}</code>
-        </pre>
-      </div>
+      {props.isClearbitEnabled && (
+          <div className='mt-2'>
+            <Modal
+                modalButtonText="See Enrichment Data"
+                modalName="enrichment-modal"
+            >
+              <div className="text-2xl font-semibold mb-2">Enrichment</div>
+            </Modal>
+          </div>
+      )}
     </div>
   );
 }

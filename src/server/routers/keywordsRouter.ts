@@ -4,7 +4,6 @@ import {keywordSearchSchema} from "~/utils/schemas/username";
 
 import * as cheerio from "cheerio";
 import * as puppeteer from "puppeteer";
-import {getClearbitDataByCompanyName} from "~/Integrations/Clearbit";
 import {IIndeedDataResult} from "~/components/Dashboard";
 
 const chrome = require("chrome-aws-lambda");
@@ -84,7 +83,6 @@ export const keywordsRouter = createRouter().mutation("create", {
                 location: "",
                 companyName: "",
                 jobLink: "",
-                clearbitData: [],
             });
         }
 
@@ -98,25 +96,7 @@ export const keywordsRouter = createRouter().mutation("create", {
             result[i].location = $(elem).text();
         });
         $(companyNameSelector).each((i, elem) => {
-            if (input.hasClearbit) {
-                getClearbitDataByCompanyName($(elem).text(), input.clearbitApiKey ?? "")
-                    .then((data) => {
-                        if (data.status === 200) {
-                            console.log(data.result);
-                            result[i].clearbitData.push(data.result);
-                        } else {
-                            result[i].clearbitData.push({});
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    }).finally(() => {
-                        result[i].companyName = $(elem).text();
-                    }
-                );
-            } else {
                 result[i].companyName = $(elem).text();
-            }
         });
         $(jobLinkSelector).each((i, elem) => {
             let href = $(elem).attr("href");

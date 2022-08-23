@@ -8,6 +8,7 @@ import {
 import {trpc} from "~/utils/trpc";
 import {Integration} from "@prisma/client";
 import {extractToken} from "~/utils/extractToken";
+import {isClearbitEnabled} from "~/Integrations/Clearbit";
 
 interface Props {
     setIndeedData: React.Dispatch<any>;
@@ -53,14 +54,6 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
         [mutateAsync, setIndeedData]
     );
 
-    function isClearbitEnabled() {
-        return integrationsEnabled.some(integration => integration.type === "clearbit");
-    }
-
-    function findClearbitIntegration() {
-        return integrationsEnabled.find(integration => integration.type === "clearbit")!.data;
-    }
-
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -99,8 +92,6 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
                     onClick={() =>
                         handleSubmitKeywordSearch({
                             username: keyword as string,
-                            hasClearbit: isClearbitEnabled(),
-                            clearbitApiKey: isClearbitEnabled() ? extractToken(findClearbitIntegration()) : "",
                         })
                     }
                 >
@@ -125,7 +116,7 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
                     Start Search
                 </button>
             </div>
-            {isClearbitEnabled() && (
+            {isClearbitEnabled(integrationsEnabled) && (
                 <div className='mt-4'>
                     <h3 className="font-medium text-sm text-gray-500">Your search will be enhanced with the clearbit integration.</h3>
                 </div>
