@@ -45,7 +45,7 @@ export default function IndeedResultList(props: Props) {
             <Modal
                 modalButtonText="See Enrichment Data"
                 tooltip={`See Enrichment Data for ${props.title}`}
-                modalName={`enrichment-modal-${props.title}`}
+                modalName={`enrichment-modal-${props.jobLink}`}
             >
               <div className="text-2xl font-semibold mb-2">Enrichment</div>
               <div className='mt-3'>
