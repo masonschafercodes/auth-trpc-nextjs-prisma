@@ -81,7 +81,7 @@ export default function TagsCreation({ setIndeedData }: Props) {
             </div>
           </div>
         ) : (
-          <div className="text-sm text-gray-700">No username yet</div>
+          <div className="text-sm text-gray-700">No tags yet</div>
         )}
       </div>
       <div className="mt-2">
