@@ -32,6 +32,11 @@ export default function IndeedResultList(props: IIndeedDataResult) {
           <ArrowSquareOut size={18} className="text-gray-200" />
         </a>
       </div>
+      <div>
+        <pre>
+          <code>{JSON.stringify(props.clearbitData, null, 2)}</code>
+        </pre>
+      </div>
     </div>
   );
 }

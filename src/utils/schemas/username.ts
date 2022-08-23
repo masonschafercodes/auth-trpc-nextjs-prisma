@@ -1,7 +1,10 @@
 import * as z from "zod";
 
-export const twitterUsernameSchema = z.object({
+export const keywordSearchSchema = z.object({
   username: z.string().min(1).max(100),
+  hasClearbit: z.boolean().default(false),
+  clearbitApiKey: z.string().optional(),
 });
 
-export type ITwitterUsername = z.infer<typeof twitterUsernameSchema>;
+
+export type IKeywordSearch = z.infer<typeof keywordSearchSchema>;

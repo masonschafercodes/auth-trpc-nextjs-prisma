@@ -2,8 +2,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useCallback} from "react";
 import {useForm} from "react-hook-form";
 import {
-    ITwitterUsername,
-    twitterUsernameSchema,
+    IKeywordSearch,
+    keywordSearchSchema,
 } from "~/utils/schemas/username";
 import {trpc} from "~/utils/trpc";
 import {Integration} from "@prisma/client";
@@ -15,30 +15,27 @@ interface Props {
 }
 
 export default function TagsCreation({setIndeedData, integrationsEnabled}: Props) {
-    const [Keyword, setKeyword] =
-        React.useState<ITwitterUsername>();
+    const [keyword, setKeyword] =
+        React.useState<string>();
     const [isLoading, setIsLoading] = React.useState(false);
 
-    const {register, handleSubmit, resetField} = useForm<ITwitterUsername>({
-        resolver: zodResolver(twitterUsernameSchema),
+    const {register, handleSubmit, resetField} = useForm<IKeywordSearch>({
+        resolver: zodResolver(keywordSearchSchema),
     });
 
-    const onSubmit = useCallback(
-        async (data: ITwitterUsername) => {
-            setKeyword(data);
-            resetField("username");
-        },
-        [resetField]
-    );
+    const onSubmit = useCallback(async (data: IKeywordSearch) => {
+        setKeyword(data.username);
+        resetField("username");
+    } , [resetField]);
 
     const handleRemoveKeywordFromList = () => {
-        setKeyword(undefined);
+        setKeyword("");
     };
 
     const {mutateAsync} = trpc.useMutation(["keywords.create"]);
 
-    const handleSubmitTwitterUsername = useCallback(
-        async (data: ITwitterUsername) => {
+    const handleSubmitKeywordSearch = useCallback(
+        async (data: IKeywordSearch) => {
             try {
                 setIsLoading(true);
                 const result = await mutateAsync(data);
@@ -60,6 +57,10 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
         return integrationsEnabled.some(integration => integration.type === "clearbit");
     }
 
+    function findClearbitIntegration() {
+        return integrationsEnabled.find(integration => integration.type === "clearbit")!.data;
+    }
+
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -67,7 +68,7 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
                     <input
                         type="text"
                         placeholder="keyword to search"
-                        disabled={!!Keyword}
+                        disabled={!!keyword}
                         className="input input-bordered w-full"
                         {...register("username")}
                     />
@@ -75,15 +76,15 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
             </form>
             <div className="my-4 space-y-2">
                 <h3 className="font-semibold">Keyword</h3>
-                {Keyword ? (
+                {keyword ? (
                     <div className=" flex items-center gap-2">
                         <div className="flex items-center">
                             <div
-                                aria-label={Keyword.username}
+                                aria-label={keyword}
                                 className="bg-gray-700 hover:bg-red-500 hover:cursor-pointer p-1 rounded-lg font-semibold text-xs"
                                 onClick={() => handleRemoveKeywordFromList()}
                             >
-                                {Keyword.username}
+                                {keyword}
                             </div>
                         </div>
                     </div>
@@ -94,9 +95,13 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
             <div className="mt-2">
                 <button
                     className="btn w-full"
-                    disabled={!Keyword || isLoading}
+                    disabled={!keyword || isLoading}
                     onClick={() =>
-                        handleSubmitTwitterUsername(Keyword as ITwitterUsername)
+                        handleSubmitKeywordSearch({
+                            username: keyword as string,
+                            hasClearbit: isClearbitEnabled(),
+                            clearbitApiKey: isClearbitEnabled() ? extractToken(findClearbitIntegration()) : "",
+                        })
                     }
                 >
                     {isLoading && (
@@ -122,7 +127,7 @@ export default function TagsCreation({setIndeedData, integrationsEnabled}: Props
             </div>
             {isClearbitEnabled() && (
                 <div className='mt-4'>
-                    <h3 className="font-medium text-sm text-gray-500">Your search will be enhanced with the clearbit integration!</h3>
+                    <h3 className="font-medium text-sm text-gray-500">Your search will be enhanced with the clearbit integration.</h3>
                 </div>
             )}
         </>
