@@ -1,8 +1,9 @@
 import React from "react";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Modal from "~/components/UI/Modal";
 import TagsCreation from "./TagsCreation";
 import IndeedResultList from "./IndeedResultList";
+import {trpc} from "~/utils/trpc";
 
 interface IIndeedDataResponse {
   status: number;
@@ -28,6 +29,8 @@ export function Dashboard() {
       setShouldCloseModal(true);
     }
   }, [indeedData]);
+
+  const {isLoading, isLoadingError, error, isError, data: IntegrationsData} = trpc.useQuery(["integrations.getIntegrations"])
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -58,7 +61,7 @@ export function Dashboard() {
           closeOnDataPropagation={shouldCloseModal}
         >
           <div className="text-2xl font-semibold mb-2">Start New Search</div>
-          <TagsCreation setIndeedData={setIndeedData} />
+          <TagsCreation integrationsEnabled={IntegrationsData !== undefined ? IntegrationsData : []} setIndeedData={setIndeedData} />
         </Modal>
       </div>
       <div className="my-12 flex flex-col justify-center items-center w-full">
