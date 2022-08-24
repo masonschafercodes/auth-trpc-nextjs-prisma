@@ -98,7 +98,7 @@ export function Dashboard() {
                                   setIndeedData={setIndeedData} refetchSavedSearches={refetchSavedSearches}/>
                 </Modal>
             </div>
-            <div className="text-xl font-semibold text-gray-500 mb-2">Saved Searches</div>
+            <div className="text-lg font-semibold text-gray-500 mb-2">Saved Searches</div>
             <div className="my-2 flex flex-col justify-center items-center w-full">
                 {isSavedSearchesLoading ? <div>Loading...</div> : (
                     <div className='w-full'>

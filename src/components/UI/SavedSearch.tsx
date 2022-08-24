@@ -10,9 +10,9 @@ interface Props {
 
 function SavedSearch(props: Props) {
     return (
-        <div className='p-3 border border-gray-600 rounded-lg'>
+        <div className='p-3 border border-gray-600 rounded-lg shadow-lg'>
             <div>
-                <h3 className='text-gray-300 font-semibold'>Query: {props.savedSearch.query}</h3>
+                <h3 className='text-gray-500 font-bold'>Query: <span className='font-normal text-gray-300'>{props.savedSearch.query}</span></h3>
                 <p className='text-gray-500 text-sm italic'>Searched
                     at: {new Date(props.savedSearch.createdAt).toLocaleDateString()}</p>
             </div>
