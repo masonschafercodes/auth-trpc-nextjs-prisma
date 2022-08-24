@@ -6,6 +6,7 @@ interface Props {
     tooltip?: string;
     closeOnDataPropagation?: boolean;
     modalName: string;
+    modalSize?: "sm" | "lg";
 }
 
 export default function Modal({
@@ -13,7 +14,8 @@ export default function Modal({
                                   children,
                                   tooltip,
                                   closeOnDataPropagation,
-                                  modalName
+                                  modalName,
+                                  modalSize
                               }: Props) {
     const modalCheckbox = React.useRef<HTMLInputElement>(null);
 
@@ -39,7 +41,7 @@ export default function Modal({
                     className="modal-toggle"
                 />
                 <div className="modal">
-                    <div className="modal-box relative border border-gray-600 bg-base-300">
+                    <div className={modalSize === 'lg' ? "modal-box w-11/12 max-w-5xl border border-gray-600 bg-base-300" : "modal-box relative border border-gray-600 bg-base-300"}>
                         <label
                             htmlFor={modalName}
                             className="btn btn-xs btn-circle absolute right-2 top-2"

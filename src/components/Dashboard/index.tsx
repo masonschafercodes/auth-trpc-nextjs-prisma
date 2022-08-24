@@ -5,7 +5,7 @@ import TagsCreation from "./TagsCreation";
 import IndeedResultList from "./IndeedResultList";
 import {trpc} from "~/utils/trpc";
 import {getClearbitIntegrationKey, isClearbitEnabled} from "~/Integrations/Clearbit";
-import {Session} from "next-auth";
+import SavedSearch from "~/components/UI/SavedSearch";
 
 interface IIndeedDataResponse {
     status: number;
@@ -21,7 +21,7 @@ export interface IIndeedDataResult {
     jobLink: string;
 }
 
-interface ISavedSearch {
+export interface ISavedSearch {
     createdAt: string;
     id: string;
     query: string;
@@ -29,7 +29,7 @@ interface ISavedSearch {
 }
 
 export function Dashboard() {
-    const { data: session } = useSession();
+    const {data: session} = useSession();
     const [indeedData, setIndeedData] = React.useState<IIndeedDataResponse>();
     const [shouldCloseModal, setShouldCloseModal] = React.useState(false);
     const [savedSearches, setSavedSearches] = React.useState<ISavedSearch[]>([]);
@@ -44,7 +44,11 @@ export function Dashboard() {
         data: IntegrationsData
     } = trpc.useQuery(["integrations.getIntegrations"])
 
-    const { data: SavedSearchData, isLoading: isSavedSearchesLoading, refetch: refetchSavedSearches } = trpc.useQuery(["keywords.get", { userId: session?.user?.email as string }], {
+    const {
+        data: SavedSearchData,
+        isLoading: isSavedSearchesLoading,
+        refetch: refetchSavedSearches
+    } = trpc.useQuery(["keywords.get", {userId: session?.user?.email as string}], {
         refetchOnWindowFocus: false,
         onSuccess: (data: any) => {
             data.result.map((savedSearch: any) => {
@@ -94,41 +98,40 @@ export function Dashboard() {
                                   setIndeedData={setIndeedData} refetchSavedSearches={refetchSavedSearches}/>
                 </Modal>
             </div>
-            <div className="my-12 flex flex-col justify-center items-center w-full">
+            <div className="text-xl font-semibold text-gray-500 mb-2">Saved Searches</div>
+            <div className="my-2 flex flex-col justify-center items-center w-full">
                 {isSavedSearchesLoading ? <div>Loading...</div> : (
-                    <div>
-                        <div className="text-2xl font-semibold mb-2">Saved Searches</div>
+                    <div className='w-full'>
                         <div className="flex flex-col gap-2">
-                            {savedSearches.map((savedSearch: ISavedSearch) => (
-                                <div key={savedSearch.id} className="flex flex-col gap-2">
-                                    <div className="text-2xl font-semibold mb-2">{savedSearch.query}</div>
-                                    <code>{JSON.stringify(savedSearch.result, null, 2)}</code>
-                                    <div className="text-sm text-gray-600">{savedSearch.createdAt}</div>
-                                </div>
-))}
+                            {savedSearches.slice(0, 3).map((savedSearch: ISavedSearch) => (
+                                <SavedSearch key={savedSearch.id} savedSearch={savedSearch}/>
+                            ))}
+                        </div>
                     </div>
+                )}
+                <div className="divider"></div>
+                <div className='w-full'>
+                    {!indeedData ? (
+                        <h1 className="text-sm font-semibold text-gray-600">
+                            No jobs searched yet!
+                        </h1>
+                    ) : (
+                        <div className="space-y-2 w-full">
+                            {indeedData.result.map((result, index) => (
+                                <IndeedResultList
+                                    key={index}
+                                    title={result.title}
+                                    jobLink={result.jobLink}
+                                    location={result.location}
+                                    ratingNumber={result.ratingNumber}
+                                    companyName={result.companyName}
+                                    isClearbitEnabled={isClearbitEnabled(IntegrationsData ?? [])}
+                                    clearbitIntegrationKey={getClearbitIntegrationKey(IntegrationsData ?? [])}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
-                )}
-                {!indeedData ? (
-                    <h1 className="text-sm font-semibold text-gray-600">
-                        No jobs searched yet!
-                    </h1>
-                ) : (
-                    <div className="space-y-2 w-full">
-                        {indeedData.result.map((result, index) => (
-                            <IndeedResultList
-                                key={index}
-                                title={result.title}
-                                jobLink={result.jobLink}
-                                location={result.location}
-                                ratingNumber={result.ratingNumber}
-                                companyName={result.companyName}
-                                isClearbitEnabled={isClearbitEnabled(IntegrationsData ?? [])}
-                                clearbitIntegrationKey={getClearbitIntegrationKey(IntegrationsData ?? [])}
-                            />
-                        ))}
-                    </div>
-                )}
             </div>
         </div>
     );
