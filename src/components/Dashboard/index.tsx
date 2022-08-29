@@ -4,8 +4,12 @@ import Modal from "~/components/UI/Modal";
 import TagsCreation from "./TagsCreation";
 import IndeedResultList from "./IndeedResultList";
 import { trpc } from "~/utils/trpc";
-import { getClearbitIntegrationKey, isClearbitEnabled } from "~/Integrations/Clearbit";
+import {
+  getClearbitIntegrationKey,
+  isClearbitEnabled,
+} from "~/Integrations/Clearbit";
 import SavedSearch from "~/components/UI/SavedSearch";
+import { Eye, EyeSlash } from "phosphor-react";
 
 interface IIndeedDataResponse {
   status: number;
@@ -33,6 +37,7 @@ export function Dashboard() {
   const [indeedData, setIndeedData] = React.useState<IIndeedDataResponse>();
   const [shouldCloseModal, setShouldCloseModal] = React.useState(false);
   const [savedSearches, setSavedSearches] = React.useState<ISavedSearch[]>([]);
+  const [showSavedSearches, setShowSavedSearches] = React.useState(false);
 
   React.useEffect(() => {
     if (indeedData) {
@@ -40,39 +45,43 @@ export function Dashboard() {
     }
   }, [indeedData]);
 
-  const {
-    data: IntegrationsData
-  } = trpc.useQuery(["integrations.getIntegrations"])
+  const { data: IntegrationsData } = trpc.useQuery([
+    "integrations.getIntegrations",
+  ]);
 
-  const {
-    isLoading: isSavedSearchesLoading,
-    refetch: refetchSavedSearches
-  } = trpc.useQuery(["keywords.get", { userId: session?.user?.email as string }], {
-    refetchOnWindowFocus: false,
-    onSuccess: (data: any) => {
-      data.result.map((savedSearch: any) => {
-        setSavedSearches(prevSavedSearches => [...prevSavedSearches, {
-          createdAt: savedSearch.createdAt,
-          id: savedSearch.id,
-          query: savedSearch.query,
-          result: JSON.parse(savedSearch.result)
-        }]);
-      })
-    }
-  });
+  const { isLoading: isSavedSearchesLoading, refetch: refetchSavedSearches } =
+    trpc.useQuery(
+      ["keywords.get", { userId: session?.user?.email as string }],
+      {
+        refetchOnWindowFocus: false,
+        onSuccess: (data: any) => {
+          data.result.map((savedSearch: any) => {
+            setSavedSearches((prevSavedSearches) => [
+              ...prevSavedSearches,
+              {
+                createdAt: savedSearch.createdAt,
+                id: savedSearch.id,
+                query: savedSearch.query,
+                result: JSON.parse(savedSearch.result),
+              },
+            ]);
+          });
+        },
+      }
+    );
 
   return (
     <div className="max-w-6xl mx-auto">
       <div>
         <div className="navbar justify-between bg-base-100">
           <a className="btn btn-ghost normal-case text-xl">DataTrak</a>
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href='/profile' className="btn btn-ghost btn-sm normal-case">
+            <a href="/profile" className="btn btn-ghost btn-sm normal-case">
               Profile
             </a>
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href='/dashboard' className="btn btn-ghost btn-sm normal-case">
+            <a href="/dashboard" className="btn btn-ghost btn-sm normal-case">
               Dashboard
             </a>
             <button
@@ -92,23 +101,53 @@ export function Dashboard() {
           closeOnDataPropagation={shouldCloseModal}
         >
           <div className="text-2xl font-semibold mb-2">Start New Search</div>
-          <TagsCreation integrationsEnabled={IntegrationsData !== undefined ? IntegrationsData : []}
-            setIndeedData={setIndeedData} refetchSavedSearches={refetchSavedSearches} />
+          <TagsCreation
+            integrationsEnabled={
+              IntegrationsData !== undefined ? IntegrationsData : []
+            }
+            setIndeedData={setIndeedData}
+            refetchSavedSearches={refetchSavedSearches}
+          />
         </Modal>
       </div>
-      <div className="text-lg font-semibold text-gray-500 mb-2">Saved Searches</div>
+      <div className="text-lg font-semibold text-gray-500 mb-2 flex gap-2 items-center">
+        Saved Searches
+        <div>
+          <button
+            className="btn btn-circle btn-ghost"
+            onClick={() => setShowSavedSearches(!showSavedSearches)}
+          >
+            {showSavedSearches ? (
+              <EyeSlash className="w-6 h-6" />
+            ) : (
+              <Eye className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+      </div>
       <div className="my-2 flex flex-col justify-center items-center w-full">
-        {isSavedSearchesLoading ? <div>Loading...</div> : (
-          <div className='w-full'>
-            <div className="flex flex-col gap-2">
-              {savedSearches.slice(0, 3).map((savedSearch: ISavedSearch) => (
-                <SavedSearch key={savedSearch.id} savedSearch={savedSearch} />
-              ))}
-            </div>
-          </div>
+        {isSavedSearchesLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            {showSavedSearches && (
+              <div className="w-full">
+                <div className="flex flex-col gap-2">
+                  {savedSearches
+                    .slice(0, 3)
+                    .map((savedSearch: ISavedSearch) => (
+                      <SavedSearch
+                        key={savedSearch.id}
+                        savedSearch={savedSearch}
+                      />
+                    ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
-        <div className="divider"></div>
-        <div className='w-full'>
+        <div className="w-full">
+          <div className="divider"></div>
           {!indeedData ? (
             <h1 className="text-sm font-semibold text-gray-600">
               No jobs searched yet!
@@ -124,7 +163,9 @@ export function Dashboard() {
                   ratingNumber={result.ratingNumber}
                   companyName={result.companyName}
                   isClearbitEnabled={isClearbitEnabled(IntegrationsData ?? [])}
-                  clearbitIntegrationKey={getClearbitIntegrationKey(IntegrationsData ?? [])}
+                  clearbitIntegrationKey={getClearbitIntegrationKey(
+                    IntegrationsData ?? []
+                  )}
                 />
               ))}
             </div>

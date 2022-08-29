@@ -53,13 +53,10 @@ export default function TagsCreation({
       } catch (error) {
         console.error(error);
       } finally {
-        if (shouldSaveSearch) {
-          refetchSavedSearches();
-        }
         setIsLoading(false);
       }
     },
-    [mutateAsync, refetchSavedSearches, setIndeedData, shouldSaveSearch]
+    [mutateAsync, setIndeedData]
   );
 
   const { data: session } = useSession();
