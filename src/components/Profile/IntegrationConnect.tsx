@@ -26,7 +26,7 @@ export default function IntegrationConnect(props: Props) {
           <div>
             <input
               type="checkbox"
-              className="toggle toggle-sm hover:cursor-not-allowed"
+              className="toggle toggle-sm toggle-secondary hover:cursor-not-allowed"
               checked={props.isConnected}
               readOnly
             />

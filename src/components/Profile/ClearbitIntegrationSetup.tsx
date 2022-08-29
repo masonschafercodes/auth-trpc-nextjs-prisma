@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -49,11 +50,31 @@ export default function ClearbitIntegrationSetup() {
 
   return (
     <div>
-      <div className="my-2">
-        <h1 className="text-xl font-semibold">Setup Clearbit Integration</h1>
+      <div className="flex justify-center items-center w-full">
+        <div className="my-2 flex items-center justify-center w-1/2 gap-4">
+          <div className="p-1.5 bg-gray-700 rounded">
+            <h1 className="font-bold text-3xl">DT</h1>
+          </div>
+          <div>
+            <img
+              src="https://asset.brandfetch.io/idPfQccWRj/idZcHaRy4-.jpeg?updated=1635901775059"
+              alt={`integration image for clearbit`}
+              className="w-12 h-12 rounded"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="my-2 space-y-2 text-center">
+        <h1 className="text-xl font-semibold text-gray-300">
+          Connect DataTrak to Clearbit
+        </h1>
+        <p className="text-sm text-gray-500">
+          Clearbit develops business intelligence to help companies find more
+          information of customers in order to increase sales and reduce fraud.
+        </p>
       </div>
       <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-        <div className="w-full">
+        <div className="form-control w-full">
           <input
             type="text"
             placeholder="token for clearbit"
@@ -61,7 +82,7 @@ export default function ClearbitIntegrationSetup() {
             {...register("token")}
           />
           <button
-            className="btn w-full mt-2"
+            className="btn w-full mt-6"
             type="submit"
             disabled={isLoading}
           >
