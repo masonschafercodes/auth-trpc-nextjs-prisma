@@ -132,7 +132,7 @@ export function Dashboard() {
               <div className="w-full">
                 <div className="flex flex-col gap-2">
                   {savedSearches
-                    .slice(0, 3)
+                    .slice(0, 4)
                     .map((savedSearch: ISavedSearch) => (
                       <SavedSearch
                         key={savedSearch.id}
