@@ -126,9 +126,7 @@ export function Dashboard() {
         </div>
       </div>
       <div className="my-2 flex flex-col justify-center items-center w-full">
-        {isSavedSearchesLoading ? (
-          <div>Loading...</div>
-        ) : (
+        {isSavedSearchesLoading ? null : (
           <>
             {showSavedSearches && (
               <div className="w-full">
