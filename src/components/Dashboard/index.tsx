@@ -112,17 +112,19 @@ export function Dashboard() {
       </div>
       <div className="text-lg font-semibold text-gray-500 mb-2 flex gap-2 items-center">
         Saved Searches
-        <div>
-          <button
-            className="btn btn-circle btn-ghost"
-            onClick={() => setShowSavedSearches(!showSavedSearches)}
-          >
-            {showSavedSearches ? (
-              <EyeSlash className="w-6 h-6" />
-            ) : (
-              <Eye className="w-6 h-6" />
-            )}
-          </button>
+        <div className="tooltip" data-tip={showSavedSearches ? "Hide" : "Show"}>
+          <div>
+            <button
+              className="btn btn-circle btn-ghost"
+              onClick={() => setShowSavedSearches(!showSavedSearches)}
+            >
+              {showSavedSearches ? (
+                <EyeSlash className="w-6 h-6" />
+              ) : (
+                <Eye className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
       <div className="my-2 flex flex-col justify-center items-center w-full">

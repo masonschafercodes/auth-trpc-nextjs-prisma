@@ -111,14 +111,14 @@ export default function TagsCreation({
         <button
           className="btn w-full"
           disabled={!keyword || isLoading}
-          onClick={() =>
+          onClick={() => {
             handleSubmitKeywordSearch({
               username: keyword as string,
               shouldSave: shouldSaveSearch,
               // @ts-ignore
               userId: session?.id,
-            })
-          }
+            });
+          }}
         >
           {isLoading && (
             <svg

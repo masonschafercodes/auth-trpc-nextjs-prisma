@@ -11,8 +11,7 @@ export const integrationsRouter = createRouter()
     resolve: async ({ ctx }) => {
       return await ctx.prisma.integration.findMany({
         where: {
-          // @ts-ignore
-          userId: ctx.session?.user?.id,
+          userId: ctx.session?.id as string,
         },
       });
     },
